@@ -1,0 +1,31 @@
+name: Django CI/CD
+
+on: [push]
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v3
+
+      - name: Install SSH Key
+        uses: shimataro/ssh-key-action@v2
+        with:
+          key: ${{ secrets.CI_PRIVATE_KEY }}
+          known_hosts: just-a-placeholder-so-we-dont-get-errors
+          config: |
+            StrictHostKeyChecking=no
+          if_key_exists: fail
+
+      - name: Deploy Code to Server
+        run: ssh art@3.111.49.170 -p22 << 'EOF'
+          cd /home/art/simple-django-app/cool_counters
+          git pull origin main
+          source /home/art/venv/bin/activate
+          pip install -r requirements.txt
+          python manage.py migrate
+          python manage.py collectstatic --noinput
+          exit
+          EOF
+
