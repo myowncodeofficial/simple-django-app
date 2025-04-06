@@ -4,28 +4,17 @@ on: [push]
 
 jobs:
   deploy:
-    runs-on: ubuntu-latest
+    runs-on: self-hosted
     steps:
-      - name: Checkout Repository
+      - name: Checkout Code
         uses: actions/checkout@v3
 
-      - name: Install SSH Key
-        uses: shimataro/ssh-key-action@v2
-        with:
-          key: ${{ secrets.CI_PRIVATE_KEY }}
-          known_hosts: just-a-placeholder-so-we-dont-get-errors
-          config: |
-            StrictHostKeyChecking=no
-          if_key_exists: fail
-
-      - name: Deploy Code to Server
+      - name: Pull Latest Code
         run: |
-          ssh art@3.111.49.170 -p22 << 'EOF'
-          cd /home/art/simple-django-app/cool_counters
+          cd C:\Users\ASUS\test\simple-django-app\cool_counters
           git pull origin main
-          source /home/art/venv/bin/activate
-          pip install -r requirements.txt
-          python manage.py migrate
-          exit
-          EOF
 
+      - name: Run Migrations
+        run: |
+          cd C:\Users\ASUS\test\simple-django-app\cool_counters
+          python manage.py migrate
